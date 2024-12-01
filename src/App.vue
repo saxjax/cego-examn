@@ -107,7 +107,6 @@ export default {
 <template>
   <div id="app">
     <div class="status">{{ statusMessage }}</div>
-    <p>{{ board }}</p>
     <button v-on:click="reset">Reset</button>
     <template class="board" v-for="(row, rowIndex) in board" :key="row">
       <div class="row">
