@@ -4,7 +4,7 @@ export default {
   data() {
     return {
       gameOn: true,
-      status: 'Next player X',
+      statusMessage: 'Next player X',
       activePlayer: 'X',
       board: [
         ['', '', ''],
@@ -33,12 +33,13 @@ export default {
         
         this.board[row][col] = player;
 
-        if (this.checkWins(player)) {
-          this.status = player + ' has won!';
+        if (this.playerHasWon(player)) {
+          this.statusMessage = player + ' has won!';
           this.gameOn = false;
         }
-        else if (this.detectTie()) {
-          this.status = 'Tie, end of game, clict reset'
+        else if (this.gameIsTie()) {
+          this.statusMessage = 'Tie, end of game, clict reset'
+          this.gameOn = false
         }
         else {
           this.togglePlayer()
@@ -48,7 +49,7 @@ export default {
 
     togglePlayer() {
       this.activePlayer === 'X' ? this.activePlayer = 'O' : this.activePlayer = 'X'
-      this.status = 'Next player ' + this.activePlayer
+      this.statusMessage = 'Next player ' + this.activePlayer
     },
 
     reset() {
@@ -69,7 +70,7 @@ export default {
       return this.board[row][coll] === ''
     },
 
-    checkWins(player) {
+    playerHasWon(player) {
       for (let win of this.wins) {
         if (this.detectWin(win, player)) {
           return true
@@ -87,7 +88,7 @@ export default {
       return true
     },
 
-    detectTie() {
+    gameIsTie() {
       for (const row of this.board) {
         for (const cell of row) {
           if (cell === '') {
@@ -105,7 +106,7 @@ export default {
 
 <template>
   <div id="app">
-    <div class="status">{{ status }}</div>
+    <div class="status">{{ statusMessage }}</div>
     <p>{{ board }}</p>
     <button v-on:click="reset">Reset</button>
     <template class="board" v-for="(row, rowIndex) in board" :key="row">
