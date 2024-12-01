@@ -1,25 +1,68 @@
 <script>
 export default {
-  name:'App',
+  name: 'App',
   data() {
-  return {
-    status:'Next player X',
-    activePlayer: 'X'
-  }
-},
-methods:{
-  onClick(id,player){
-    this.togglePlayer()
-    console.log(id,player);
-  },
+    return {
+      status: 'Next player X',
+      activePlayer: 'X',
+      board: [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+      ],
+      wins: [
+        [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
+        [{ row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
+        [{ row: 2, col: 0 }, { row: 2, col: 1 }, { row: 2, col: 2 }],
+        [{ row: 0, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 2 }],
+        [{ row: 0, col: 2 }, { row: 1, col: 1 }, { row: 2, col: 0 }],
+      ]
 
-  togglePlayer(){
-    this.activePlayer === 'X' ? this.activePlayer = 'O' : this.activePlayer = 'X'
-    this.status = 'Next player ' + this.activePlayer
-    console.log(this.status)
+    }
+  },
+  methods: {
+    onClick(row, cell, player) {
+      this.board[row][cell] = player;
+      if (this.checkWins(player)) {
+        this.status = player + ' has won!';
+      }
+      else {
+        this.togglePlayer()
+      }
+    },
+
+    togglePlayer() {
+      this.activePlayer === 'X' ? this.activePlayer = 'O' : this.activePlayer = 'X'
+      this.status = 'Next player ' + this.activePlayer
+      // console.log(this.status)
+    },
+    initializeGameBoard() {
+      this.board = [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+      ]
+    },
+
+    checkWins(player) {
+      for (let win of this.wins) {
+        if (this.detectWin(win, player)) {
+          return true
+        };
+      }
+      return false
+    },
+    
+    detectWin(win, player) {
+      for (let cell of win) {
+        if (this.board[cell.row][cell.col] !== player) {
+          return false
+        }
+      }
+      return true
+    },
+
   }
-  
-}
 }
 
 </script>
@@ -27,22 +70,25 @@ methods:{
 <template>
   <div id="app">
     <div class="status">{{ status }}</div>
-    <button>Reset</button>
-      <template class="board" v-for="row in 3" :key="row">
-        <div class="row">
-          <button v-for="button in 3" :key="button" v-on:click="onClick([row,button],activePlayer)" class="square" style="width: 40px;height: 40px;"></button>
-        </div>
-      </template>
+    <p>{{ board }}</p>
+    <button v-on:click="initializeGameBoard">Reset</button>
+    <template class="board" v-for="(row, rowIndex) in board" :key="row">
+      <div class="row">
+        <button v-for="(cell, cellIndex) in row" :key="cell" v-on:click="onClick(rowIndex, cellIndex, activePlayer)"
+          class="square" style="width: 40px;height: 40px;">{{ cell }}</button>
+      </div>
+    </template>
   </div>
 </template>
 
 
 
 <style scoped>
-#app{
+#app {
   display: block;
 }
-.board{
-  display:flex
+
+.board {
+  display: flex
 }
 </style>
