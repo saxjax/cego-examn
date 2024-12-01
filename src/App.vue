@@ -26,6 +26,9 @@ export default {
       if (this.checkWins(player)) {
         this.status = player + ' has won!';
       }
+      else if(this.detectTie()){
+        this.status = 'Tie, end of game, clict reset'
+      }
       else {
         this.togglePlayer()
       }
@@ -52,7 +55,7 @@ export default {
       }
       return false
     },
-    
+
     detectWin(win, player) {
       for (let cell of win) {
         if (this.board[cell.row][cell.col] !== player) {
@@ -61,6 +64,17 @@ export default {
       }
       return true
     },
+
+    detectTie(){
+      for(const row of this.board){
+        for(const cell of row){
+          if(cell === ''){
+            return false
+          }
+        }
+      }
+      return true
+    }
 
   }
 }
