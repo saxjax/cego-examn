@@ -3,6 +3,7 @@ export default {
   name: 'App',
   data() {
     return {
+      gameOn: true,
       status: 'Next player X',
       activePlayer: 'X',
       board: [
@@ -11,9 +12,15 @@ export default {
         ['', '', '']
       ],
       wins: [
+        //rows
         [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
         [{ row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
         [{ row: 2, col: 0 }, { row: 2, col: 1 }, { row: 2, col: 2 }],
+        //collumns
+        [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 }],
+        [{ row: 0, col: 1 }, { row: 1, col: 1 }, { row: 2, col: 1 }],
+        [{ row: 0, col: 2 }, { row: 1, col: 2 }, { row: 2, col: 2 }],
+        //diagonals
         [{ row: 0, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 2 }],
         [{ row: 0, col: 2 }, { row: 1, col: 1 }, { row: 2, col: 0 }],
       ]
@@ -21,30 +28,45 @@ export default {
     }
   },
   methods: {
-    onClick(row, cell, player) {
-      this.board[row][cell] = player;
-      if (this.checkWins(player)) {
-        this.status = player + ' has won!';
-      }
-      else if(this.detectTie()){
-        this.status = 'Tie, end of game, clict reset'
-      }
-      else {
-        this.togglePlayer()
+    onClick(row, col, player) {
+      if (this.gameOn && this.cellIsEmpty(row, col)) {
+        
+        this.board[row][col] = player;
+
+        if (this.checkWins(player)) {
+          this.status = player + ' has won!';
+          this.gameOn = false;
+        }
+        else if (this.detectTie()) {
+          this.status = 'Tie, end of game, clict reset'
+        }
+        else {
+          this.togglePlayer()
+        }
       }
     },
 
     togglePlayer() {
       this.activePlayer === 'X' ? this.activePlayer = 'O' : this.activePlayer = 'X'
       this.status = 'Next player ' + this.activePlayer
-      // console.log(this.status)
     },
+
+    reset() {
+      this.togglePlayer()
+      this.initializeGameBoard()
+      this.gameOn = true
+    },
+
     initializeGameBoard() {
       this.board = [
         ['', '', ''],
         ['', '', ''],
         ['', '', '']
       ]
+    },
+
+    cellIsEmpty(row, coll){
+      return this.board[row][coll] === ''
     },
 
     checkWins(player) {
@@ -65,10 +87,10 @@ export default {
       return true
     },
 
-    detectTie(){
-      for(const row of this.board){
-        for(const cell of row){
-          if(cell === ''){
+    detectTie() {
+      for (const row of this.board) {
+        for (const cell of row) {
+          if (cell === '') {
             return false
           }
         }
@@ -85,7 +107,7 @@ export default {
   <div id="app">
     <div class="status">{{ status }}</div>
     <p>{{ board }}</p>
-    <button v-on:click="initializeGameBoard">Reset</button>
+    <button v-on:click="reset">Reset</button>
     <template class="board" v-for="(row, rowIndex) in board" :key="row">
       <div class="row">
         <button v-for="(cell, cellIndex) in row" :key="cell" v-on:click="onClick(rowIndex, cellIndex, activePlayer)"
